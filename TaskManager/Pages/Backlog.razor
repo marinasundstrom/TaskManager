@@ -1,0 +1,67 @@
+﻿@page "/backlog"
+
+<PageTitle>Backlog</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Backlog</MudText>
+
+<MudPaper Elevation="25">
+    <MudDropContainer T="WorkItem" Items="_items" ItemsSelector="@((item,dropzone) => item.Selector == dropzone)" ItemDropped="ItemUpdated">
+        <ChildContent>
+            <MudList Clickable="true" Class="d-flex flex-column mud-height-full">
+                <MudDropZone T="WorkItem" Identifier="list" Class="flex-grow-0 flex-shrink-0" AllowReorder="true" />
+            </MudList>
+        </ChildContent>
+        <ItemRenderer>
+            <MudListItem Icon="@Icons.Material.Filled.Book">
+                <ChildContent>
+                    <MudText><strong>@context.Title</strong> - @context.Title</MudText>
+                </ChildContent>
+                <NestedList>
+                    <MudList Clickable="true" Class="d-flex flex-column mud-height-full">
+                        @foreach (var context2 in context.SubItems)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.Task" Text="@context2.Title" Class="ps-16">
+
+                            </MudListItem>
+                        }
+                    </MudList>
+                </NestedList>
+            </MudListItem>
+        </ItemRenderer>
+    </MudDropContainer>
+</MudPaper>
+
+@code {
+    private void ItemUpdated(MudItemDropInfo<WorkItem> dropItem)
+    {
+        dropItem.Item.Selector = dropItem.DropzoneIdentifier;
+    }
+
+    private List<WorkItem> _items = new()
+{
+        new WorkItem()
+        {
+            Id = 1,
+            Title = "Chores", Content = "Things that I have to do...", Selector = "list", SubItems = new List<WorkItem>()
+{
+                new WorkItem(){ Id = 3, Title = "Walk the dog", Content = "dgsdf", Selector = "item-1" },
+                new WorkItem(){ Id = 6, Title = "Do the dishes", Content = "dgsdf", Selector = "item-1" }
+            }
+        },
+        new WorkItem(){ Id = 3, Title = "My Birthday Party", Content = "dgsdf", Selector = "list", SubItems = new List<WorkItem>()
+{
+                new WorkItem(){ Id = 5, Title = "Buy sweets", Content = "dgsdf", Selector = "item-3" },
+                new WorkItem(){ Id = 8, Title = "Clean the house", Content = "dgsdf", Selector = "item-3" }
+            } },
+        new WorkItem(){ Id = 4, Title = "Misc", Content = "dgsdf", Selector = "list", SubItems = new List<WorkItem>() },
+    };
+
+    public class WorkItem
+    {
+        public int Id { get; init; }
+        public string Title { get; init; }
+        public string Content { get; set; }
+        public string Selector { get; set; }
+        public List<WorkItem> SubItems { get; set; }
+    }
+}

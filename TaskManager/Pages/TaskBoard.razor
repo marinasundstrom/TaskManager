@@ -1,0 +1,112 @@
+﻿@page "/"
+
+<PageTitle>Taskboard</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Taskboard</MudText>
+
+<MudExpansionPanels MultiExpansion="true" Elevation="25">
+    @foreach (var context in _items)
+    {
+        <MudExpansionPanel>
+            <TitleContent>
+                <div class="d-flex">
+                    <MudIcon Icon="@Icons.Material.Filled.Book" class="mr-3"></MudIcon>
+                    <MudText><strong>@context.Title</strong> - @context.Content</MudText>
+                </div>
+            </TitleContent>
+
+            <ChildContent>
+                <MudDropContainer T="WorkItem" Items="context.SubItems" Context="context2" ItemsSelector="@((item,dropzone) => item.Selector == dropzone)" ItemDropped="ItemUpdated">
+                    <ChildContent>
+                        <div class="d-flex flex-wrap flex-grow-1">
+                            @*<MudPaper Class="ma-4 flex-1 mud-background-gray rounded-lg pa-8">
+                                       @context.Content
+                                </MudPaper>*@
+
+                            @for (int i = 1; i < 4; i++)
+                            {
+                                string name = areas[i - 1];
+
+                                var dropzone = i.ToString();
+                                <MudPaper Elevation="0" Class="ma-4 flex-1 mud-background-gray rounded-lg">
+                                    <MudList Clickable="true" Class="d-flex flex-column mud-height-full">
+                                        <MudListSubheader>
+                                            <MudToolBar DisableGutters="true" Dense="true">
+                                                <MudText Typo="Typo.h6"><b>@name</b></MudText>
+                                                <MudSpacer />
+                                                <MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
+                                                    <MudButton Size="Size.Small" Color="Color.Error" StartIcon="@Icons.Outlined.Delete" OnClick="@( () =>{})">Delete Section</MudButton>
+                                                    <MudButton Size="Size.Small" Color="Color.Default" StartIcon="@Icons.Rounded.Edit">Rename Section</MudButton>
+                                                </MudMenu>
+                                            </MudToolBar>
+                                        </MudListSubheader>
+                                        <MudDropZone T="WorkItem" Identifier="@($"item-{context.Id}-area-{dropzone}")" Class="d-flex flex-grow-1 flex-wrap gap-1" AllowReorder="true" />
+                                    </MudList>
+                                    @*                                    <MudButton OnClick="@(() => {})" Color="Color.Inherit" StartIcon="@Icons.Filled.Add" FullWidth="true" Class="py-2" Style="background-color: inherit;">Add Task</MudButton>
+                                    *@
+                                </MudPaper>
+                            }
+
+                            @*
+                                <MudTextField Lines="5" @bind-Value="context.Content" Variant="Variant.Outlined">
+
+                                </MudTextField> *@
+                        </div>
+                    </ChildContent>
+                    <ItemRenderer>
+                        <MudCard Class="ma-4 rounded-lg" Elevation="25">
+                            <MudCardContent>
+                                <div class="d-flex">
+                                    <MudIcon Icon="@Icons.Material.Filled.Task" class="mr-3"></MudIcon>
+                                    <MudText>@context2.Id - @context2.Title</MudText>
+                                </div>
+                                <MudTextField Lines="5" @bind-Value="context2.Content" Variant="Variant.Outlined">
+                                </MudTextField>
+                            </MudCardContent>
+                            @*<MudCardActions>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary">Learn More</MudButton>
+                                </MudCardActions> *@
+                        </MudCard>
+                    </ItemRenderer>
+                </MudDropContainer>
+            </ChildContent>
+        </MudExpansionPanel>
+    }
+</MudExpansionPanels>
+
+@code {
+    string[] areas = new string[] { "New", "On-going", "Completed" };
+
+    private void ItemUpdated(MudItemDropInfo<WorkItem> dropItem)
+    {
+        dropItem.Item.Selector = dropItem.DropzoneIdentifier;
+    }
+
+    private List<WorkItem> _items = new()
+{
+        new WorkItem()
+        {
+            Id = 1,
+            Title = "Chores", Content = "Things that I have to do...", Selector = "list", SubItems = new List<WorkItem>()
+    {
+                new WorkItem(){ Id = 3, Title = "Walk the dog", Content = "dgsdf", Selector = "item-1-area-2" },
+                new WorkItem(){ Id = 6, Title = "Do the dishes", Content = "dgsdf", Selector = "item-1-area-2" }
+            }
+        },
+        new WorkItem(){ Id = 3, Title = "My Birthday Party", Content = "dgsdf", Selector = "list", SubItems = new List<WorkItem>()
+    {
+                new WorkItem(){ Id = 5, Title = "Buy sweets", Content = "dgsdf", Selector = "item-3-area-1" },
+                new WorkItem(){ Id = 8, Title = "Clean the house", Content = "dgsdf", Selector = "item-3-area-2" }
+            } },
+        new WorkItem(){ Id = 4, Title = "Misc", Content = "dgsdf", Selector = "list" },
+    };
+
+    public class WorkItem
+    {
+        public int Id { get; init; }
+        public string Title { get; init; }
+        public string Content { get; set; }
+        public string Selector { get; set; }
+        public List<WorkItem> SubItems { get; set; }
+    }
+}
